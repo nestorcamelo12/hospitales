@@ -86,6 +86,11 @@ export default function PacienteForm() {
       toast.error('La fecha de nacimiento es requerida');
       return;
     }
+    // Validar hospital seleccionado (no vacío ni "0")
+    if (!formData.hospital_id || formData.hospital_id === '0') {
+      toast.error('Selecciona el hospital al que pertenece el paciente');
+      return;
+    }
 
     try {
       setLoading(true);

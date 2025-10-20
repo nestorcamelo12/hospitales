@@ -21,7 +21,7 @@ class Helpers
      */
     public static function errorResponse(string $message, int $status = 400): void
     {
-        self::jsonResponse(['error' => $message], $status);
+        self::jsonResponse(['message' => $message], $status);
     }
 
     /**

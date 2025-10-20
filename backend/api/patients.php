@@ -150,6 +150,13 @@ function handleCreatePatient(): void
         Helpers::errorResponse('hospital_id es requerido', 400);
     }
 
+    // Verificar si el documento ya existe
+    $stmt = $db->prepare("SELECT id FROM patients WHERE documento = :documento AND is_active = 1");
+    $stmt->execute([':documento' => $input['documento']]);
+    if ($stmt->fetch()) {
+        Helpers::errorResponse('Ya existe un paciente con este número de documento. Por favor, use un documento diferente.', 400);
+    }
+
     $stmt = $db->prepare("
         INSERT INTO patients (nombre, documento, fecha_nac, edad, tipo_sangre, sexo, 
                               contacto_emergencia, hospital_id, alergias, condiciones_preexistentes, created_by)
@@ -218,6 +225,15 @@ function handleUpdatePatient(int $id): void
     // Si no es admin, verificar hospital
     if ((int)$user->role !== 1 && (int)$oldPatient['hospital_id'] !== (int)$user->hospital) {
         Helpers::errorResponse('No autorizado', 403);
+    }
+
+    // Verificar si el documento ya existe en otro paciente (solo si se está cambiando)
+    if (isset($input['documento']) && $input['documento'] !== $oldPatient['documento']) {
+        $stmt = $db->prepare("SELECT id FROM patients WHERE documento = :documento AND is_active = 1 AND id != :id");
+        $stmt->execute([':documento' => $input['documento'], ':id' => $id]);
+        if ($stmt->fetch()) {
+            Helpers::errorResponse('Ya existe un paciente con este número de documento. Por favor, use un documento diferente.', 400);
+        }
     }
 
     $updates = [];
