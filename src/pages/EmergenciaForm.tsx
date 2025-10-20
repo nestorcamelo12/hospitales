@@ -180,7 +180,7 @@ export default function EmergenciaForm() {
             {pacienteSeleccionado && (
               <div className="p-3 bg-blue-50 rounded-lg text-sm">
                 <p><strong>Tipo de Sangre:</strong> {pacienteSeleccionado.tipo_sangre}</p>
-                <p><strong>Alergias:</strong> {pacienteSeleccionado.alergias.join(', ') || 'Ninguna'}</p>
+                <p><strong>Alergias:</strong> {pacienteSeleccionado.alergias || 'Ninguna'}</p>
                 <p><strong>Contacto:</strong> {pacienteSeleccionado.contacto_emergencia}</p>
               </div>
             )}

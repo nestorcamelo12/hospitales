@@ -31,7 +31,7 @@ export default function Emergencies() {
   };
 
   return (
-    <Layout userRole="paramedic">
+    <Layout>
       <div className="space-y-6 max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center">

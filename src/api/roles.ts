@@ -8,7 +8,8 @@ export interface Role {
 }
 
 export async function getRoles(): Promise<Role[]> {
-  return fetchApi<Role[]>('/roles');
+  const response = await fetchApi<{ status: string; data: Role[] }>('/roles');
+  return response.data;
 }
 
 

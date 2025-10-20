@@ -1,17 +1,9 @@
-import Layout from "@/components/Layout";
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { 
-  Search, 
-  Plus, 
-  Filter,
-  Eye,
-  Edit,
-  FileText,
-  AlertCircle
-} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -20,216 +12,318 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { 
+  Search, 
+  Plus, 
+  Eye, 
+  Edit, 
+  Trash2, 
+  Loader2,
+  ChevronLeft,
+  ChevronRight,
+  UserPlus
+} from "lucide-react";
+import { getPatients, deletePatient, Patient } from '../api/patients';
+import { toast } from 'sonner';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function Patients() {
-  const patients = [
-    {
-      id: 1,
-      name: "María González",
-      document: "CC 1.234.567",
-      age: 39,
-      bloodType: "O+",
-      allergies: ["Penicilina"],
-      hospital: "Hospital Central UNIPAZ",
-      status: "critical",
-      avatar: "MG",
-    },
-    {
-      id: 2,
-      name: "José Rodríguez",
-      document: "CC 2.345.678",
-      age: 50,
-      bloodType: "A-",
-      allergies: [],
-      hospital: "Clínica Norte",
-      status: "stable",
-      avatar: "JR",
-    },
-    {
-      id: 3,
-      name: "Ana Martínez",
-      document: "CC 3.456.789",
-      age: 28,
-      bloodType: "AB+",
-      allergies: ["Aspirina", "Ibuprofeno"],
-      hospital: "Hospital Central UNIPAZ",
-      status: "monitoring",
-      avatar: "AM",
-    },
-    {
-      id: 4,
-      name: "Carlos Hernández",
-      document: "CC 4.567.890",
-      age: 45,
-      bloodType: "B+",
-      allergies: [],
-      hospital: "Hospital Central UNIPAZ",
-      status: "stable",
-      avatar: "CH",
-    },
-    {
-      id: 5,
-      name: "Laura Torres",
-      document: "CC 5.678.901",
-      age: 33,
-      bloodType: "O-",
-      allergies: ["Látex"],
-      hospital: "Clínica Norte",
-      status: "stable",
-      avatar: "LT",
-    },
-  ];
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  const [patients, setPatients] = useState<Patient[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [patientToDelete, setPatientToDelete] = useState<number | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "critical":
-        return "bg-destructive text-destructive-foreground";
-      case "monitoring":
-        return "bg-warning text-warning-foreground";
-      case "stable":
-        return "bg-success text-success-foreground";
-      default:
-        return "bg-muted text-muted-foreground";
+  useEffect(() => {
+    loadPatients();
+  }, [currentPage, searchQuery]);
+
+  const loadPatients = async () => {
+    try {
+      setLoading(true);
+      const response = await getPatients({
+        page: currentPage,
+        per_page: 10,
+        search: searchQuery || undefined,
+      });
+      
+      setPatients(response.data);
+      setTotalPages(response.pagination.total_pages);
+      setTotal(response.pagination.total);
+    } catch (error: any) {
+      toast.error(error.message || 'Error al cargar pacientes');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "critical":
-        return "Crítico";
-      case "monitoring":
-        return "Monitoreo";
-      case "stable":
-        return "Estable";
-      default:
-        return status;
+  const handleSearch = (value: string) => {
+    setSearchQuery(value);
+    setCurrentPage(1);
+    if (value) {
+      setSearchParams({ search: value });
+    } else {
+      setSearchParams({});
     }
   };
+
+  const handleDelete = async () => {
+    if (!patientToDelete) return;
+
+    try {
+      setDeleting(true);
+      await deletePatient(patientToDelete);
+      toast.success('Paciente eliminado exitosamente');
+      setDeleteDialogOpen(false);
+      setPatientToDelete(null);
+      loadPatients();
+    } catch (error: any) {
+      toast.error(error.message || 'Error al eliminar paciente');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const getTipoSangreBadge = (tipo: string) => {
+    const colors: Record<string, string> = {
+      'O+': 'bg-blue-100 text-blue-800',
+      'O-': 'bg-blue-200 text-blue-900',
+      'A+': 'bg-green-100 text-green-800',
+      'A-': 'bg-green-200 text-green-900',
+      'B+': 'bg-purple-100 text-purple-800',
+      'B-': 'bg-purple-200 text-purple-900',
+      'AB+': 'bg-orange-100 text-orange-800',
+      'AB-': 'bg-orange-200 text-orange-900',
+    };
+    return colors[tipo] || 'bg-gray-100 text-gray-800';
+  };
+
+  if (loading && patients.length === 0) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
-    <Layout userRole="doctor">
-      <div className="space-y-6 max-w-[1600px] mx-auto">
-        {/* Header */}
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Gestión de Pacientes</h1>
-            <p className="text-muted-foreground mt-1">Administra y consulta información de pacientes</p>
-          </div>
-          
-          <Button className="bg-gradient-primary hover:opacity-90">
-            <Plus className="h-5 w-5 mr-2" />
-            Nuevo Paciente
-          </Button>
+    <div className="space-y-6 p-6">
+      {/* Header */}
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">Pacientes</h1>
+          <p className="text-muted-foreground mt-1">
+            Gestión de pacientes del sistema ({total} registros)
+          </p>
         </div>
-
-        {/* Filters & Search */}
-        <Card>
-          <CardHeader>
-            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-              <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input
-                  placeholder="Buscar por nombre o documento..."
-                  className="pl-10"
-                />
-              </div>
-              
-              <div className="flex gap-2">
-                <Button variant="outline">
-                  <Filter className="h-4 w-4 mr-2" />
-                  Filtros
-                </Button>
-              </div>
-            </div>
-          </CardHeader>
-        </Card>
-
-        {/* Patients Table */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Lista de Pacientes</CardTitle>
-            <CardDescription>
-              {patients.length} pacientes registrados
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Paciente</TableHead>
-                    <TableHead>Documento</TableHead>
-                    <TableHead>Edad</TableHead>
-                    <TableHead>Tipo Sangre</TableHead>
-                    <TableHead>Alergias</TableHead>
-                    <TableHead>Hospital</TableHead>
-                    <TableHead>Estado</TableHead>
-                    <TableHead className="text-right">Acciones</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {patients.map((patient) => (
-                    <TableRow key={patient.id} className="hover:bg-accent/50">
-                      <TableCell>
-                        <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-full bg-gradient-primary flex items-center justify-center text-white font-semibold">
-                            {patient.avatar}
-                          </div>
-                          <span className="font-medium">{patient.name}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {patient.document}
-                      </TableCell>
-                      <TableCell>{patient.age} años</TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{patient.bloodType}</Badge>
-                      </TableCell>
-                      <TableCell>
-                        {patient.allergies.length > 0 ? (
-                          <div className="flex flex-wrap gap-1">
-                            {patient.allergies.map((allergy, idx) => (
-                              <Badge 
-                                key={idx} 
-                                variant="outline" 
-                                className="bg-warning/10 text-warning border-warning/20"
-                              >
-                                <AlertCircle className="h-3 w-3 mr-1" />
-                                {allergy}
-                              </Badge>
-                            ))}
-                          </div>
-                        ) : (
-                          <span className="text-muted-foreground text-sm">Ninguna</span>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-sm">{patient.hospital}</TableCell>
-                      <TableCell>
-                        <Badge className={getStatusColor(patient.status)}>
-                          {getStatusText(patient.status)}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex gap-2 justify-end">
-                          <Button variant="ghost" size="icon">
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button variant="ghost" size="icon">
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button variant="ghost" size="icon">
-                            <FileText className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </CardContent>
-        </Card>
+        
+        <Button onClick={() => navigate('/pacientes/nuevo')} size="lg">
+          <Plus className="mr-2 h-4 w-4" />
+          Nuevo Paciente
+        </Button>
       </div>
-    </Layout>
+
+      {/* Filters */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Filtros de Búsqueda</CardTitle>
+          <CardDescription>Busca pacientes por nombre o documento</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex gap-4">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Buscar por nombre o documento..."
+                value={searchQuery}
+                onChange={(e) => handleSearch(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            {searchQuery && (
+              <Button variant="outline" onClick={() => handleSearch('')}>
+                Limpiar
+              </Button>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Lista de Pacientes</CardTitle>
+          <CardDescription>
+            Mostrando página {currentPage} de {totalPages}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <div className="flex justify-center py-8">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          ) : patients.length === 0 ? (
+            <div className="text-center py-12">
+              <UserPlus className="mx-auto h-12 w-12 text-muted-foreground opacity-50" />
+              <h3 className="mt-4 text-lg font-semibold">No hay pacientes</h3>
+              <p className="text-muted-foreground mt-2">
+                {searchQuery ? 'No se encontraron resultados para tu búsqueda.' : 'Comienza agregando tu primer paciente.'}
+              </p>
+              {!searchQuery && (
+                <Button className="mt-4" onClick={() => navigate('/pacientes/nuevo')}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Agregar Paciente
+                </Button>
+              )}
+            </div>
+          ) : (
+            <>
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Nombre</TableHead>
+                      <TableHead>Documento</TableHead>
+                      <TableHead>Edad</TableHead>
+                      <TableHead>Tipo Sangre</TableHead>
+                      <TableHead>Hospital</TableHead>
+                      <TableHead className="text-right">Acciones</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {patients.map((patient) => (
+                      <TableRow key={patient.id}>
+                        <TableCell className="font-medium">{patient.nombre}</TableCell>
+                        <TableCell>{patient.documento}</TableCell>
+                        <TableCell>{patient.edad} años</TableCell>
+                        <TableCell>
+                          <Badge className={getTipoSangreBadge(patient.tipo_sangre)}>
+                            {patient.tipo_sangre}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>{patient.hospital_nombre || 'N/A'}</TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => navigate(`/pacientes/${patient.id}`)}
+                              title="Ver detalles"
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => navigate(`/pacientes/${patient.id}/editar`)}
+                              title="Editar"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setPatientToDelete(patient.id);
+                                setDeleteDialogOpen(true);
+                              }}
+                              className="text-destructive hover:text-destructive"
+                              title="Eliminar"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-between mt-4">
+                  <div className="text-sm text-muted-foreground">
+                    Página {currentPage} de {totalPages} ({total} pacientes)
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                    >
+                      <ChevronLeft className="h-4 w-4 mr-1" />
+                      Anterior
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                      disabled={currentPage === totalPages}
+                    >
+                      Siguiente
+                      <ChevronRight className="h-4 w-4 ml-1" />
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción eliminará el paciente del sistema. Esta acción no se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Eliminando...
+                </>
+              ) : (
+                'Eliminar'
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
   );
 }

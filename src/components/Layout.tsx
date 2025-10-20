@@ -9,28 +9,43 @@ import {
   Settings,
   LogOut,
   Menu,
-  X
+  X,
+  Building2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface LayoutProps {
   children: ReactNode;
-  userRole?: "doctor" | "paramedic" | "admin";
 }
 
-export default function Layout({ children, userRole = "doctor" }: LayoutProps) {
+export default function Layout({ children }: LayoutProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const { user } = useAuth();
+
+  // Mapear role_id a role string
+  const getUserRole = (): "doctor" | "paramedic" | "admin" => {
+    if (!user) return "doctor";
+    switch (user.role_id) {
+      case 1: return "admin";
+      case 2: return "doctor";
+      case 3: return "paramedic";
+      default: return "doctor";
+    }
+  };
+
+  const userRole = getUserRole();
 
   const navigation = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, roles: ["doctor", "paramedic", "admin"] },
-    { name: "Pacientes", href: "/patients", icon: Users, roles: ["doctor", "admin"] },
-    { name: "Emergencias", href: "/emergencies", icon: AlertTriangle, roles: ["doctor", "paramedic"] },
-    { name: "Monitoreo", href: "/monitoring", icon: Activity, roles: ["doctor"] },
-    { name: "Reportes", href: "/reports", icon: FileText, roles: ["doctor", "admin"] },
-    { name: "Administración", href: "/admin", icon: Settings, roles: ["admin"] },
+    { name: "Pacientes", href: "/pacientes", icon: Users, roles: ["doctor", "admin"] },
+    { name: "Emergencias", href: "/emergencias", icon: AlertTriangle, roles: ["doctor", "paramedic", "admin"] },
+    { name: "Monitoreo", href: "/monitoreo", icon: Activity, roles: ["doctor", "admin"] },
+    { name: "Usuarios", href: "/admin/users", icon: Settings, roles: ["admin"] },
+    { name: "Hospitales", href: "/admin/hospitals", icon: Building2, roles: ["admin"] },
   ];
 
   const filteredNavigation = navigation.filter(item => item.roles.includes(userRole));

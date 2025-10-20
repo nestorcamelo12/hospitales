@@ -7,8 +7,10 @@ import Layout from "./components/Layout";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
-import Pacientes from "./pages/Pacientes";
+import Patients from "./pages/Patients";
 import PacienteProfile from "./pages/PacienteProfile";
+import PacienteForm from "./pages/PacienteForm";
+import MedicalRecordForm from "./pages/MedicalRecordForm";
 import Emergencias from "./pages/Emergencias";
 import EmergenciaForm from "./pages/EmergenciaForm";
 import EmergenciaDetail from "./pages/EmergenciaDetail";
@@ -44,8 +46,16 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Layout>
-                    <Pacientes />
+                    <Patients />
                   </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/pacientes/nuevo"
+              element={
+                <ProtectedRoute>
+                  <PacienteForm />
                 </ProtectedRoute>
               }
             />
@@ -56,6 +66,24 @@ function App() {
                   <Layout>
                     <PacienteProfile />
                   </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/pacientes/:id/editar"
+              element={
+                <ProtectedRoute>
+                  <PacienteForm />
+                </ProtectedRoute>
+              }
+            />
+            
+            {/* Medical Records Routes */}
+            <Route
+              path="/medical-records/nuevo/:patientId"
+              element={
+                <ProtectedRoute>
+                  <MedicalRecordForm />
                 </ProtectedRoute>
               }
             />
