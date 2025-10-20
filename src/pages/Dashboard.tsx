@@ -172,22 +172,22 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="space-y-6 max-w-[1600px] mx-auto p-6">
+    <div className="space-y-4 md:space-y-6 w-full">
       {/* Header */}
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-3 md:gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground">Dashboard</h1>
+          <p className="text-sm md:text-base text-muted-foreground mt-1">
             Bienvenido, {user?.name || 'Usuario'}
           </p>
         </div>
         
         {/* Search */}
-        <form onSubmit={handleSearch} className="relative w-full md:w-96">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+        <form onSubmit={handleSearch} className="relative w-full">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 md:h-5 md:w-5 text-muted-foreground" />
           <Input
-            placeholder="Buscar paciente por nombre o documento..."
-            className="pl-10"
+            placeholder="Buscar paciente..."
+            className="pl-9 md:pl-10 text-sm md:text-base"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -249,42 +249,42 @@ export default function Dashboard() {
         </Card>
       )}
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-4 md:gap-6 lg:grid-cols-3">
         {/* Critical Alerts */}
         <Card className="lg:col-span-1">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-destructive" />
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base md:text-lg">
+              <AlertTriangle className="h-4 w-4 md:h-5 md:w-5 text-destructive" />
               Alertas Críticas
             </CardTitle>
-            <CardDescription>Signos vitales críticos (últimas 24h)</CardDescription>
+            <CardDescription className="text-xs md:text-sm">Signos vitales críticos (últimas 24h)</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-2 md:space-y-3">
             {stats?.alertas_criticas && stats.alertas_criticas.length > 0 ? (
               stats.alertas_criticas.slice(0, 5).map((alert) => (
                 <div
                   key={alert.id}
-                  className={`p-3 rounded-lg border ${getSeverityColor(alert.tipo, alert.valor)}`}
+                  className={`p-2 md:p-3 rounded-lg border ${getSeverityColor(alert.tipo, alert.valor)}`}
                 >
-                  <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <p className="font-medium text-sm">{alert.paciente_nombre}</p>
-                      <p className="text-xs opacity-75">{alert.paciente_documento}</p>
+                  <div className="flex items-start justify-between mb-1 md:mb-2 gap-2">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium text-xs md:text-sm truncate">{alert.paciente_nombre}</p>
+                      <p className="text-[10px] md:text-xs opacity-75 truncate">{alert.paciente_documento}</p>
                     </div>
-                    <Badge variant="outline" className="text-xs">
+                    <Badge variant="outline" className="text-[10px] md:text-xs flex-shrink-0">
                       {formatTimeAgo(alert.fecha)}
                     </Badge>
                   </div>
-                  <p className="text-sm font-medium">
+                  <p className="text-xs md:text-sm font-medium mb-1 md:mb-2">
                     {getTipoVitalLabel(alert.tipo)}: {alert.valor} {alert.unidad}
                   </p>
                   <Button 
                     size="sm" 
                     variant="ghost" 
-                    className="w-full mt-2 h-8"
+                    className="w-full mt-1 md:mt-2 h-7 md:h-8 text-xs"
                     onClick={() => navigate(`/pacientes/${alert.paciente_id}`)}
                   >
-                    Ver Detalles <ArrowUpRight className="h-3 w-3 ml-1" />
+                    Ver Detalles <ArrowUpRight className="h-2 w-2 md:h-3 md:w-3 ml-1" />
                   </Button>
                 </div>
               ))
@@ -299,15 +299,16 @@ export default function Dashboard() {
 
         {/* Recent Patients */}
         <Card className="lg:col-span-2">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle>Pacientes Recientes</CardTitle>
-                <CardDescription>Últimas consultas y monitoreos</CardDescription>
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between gap-2">
+              <div className="min-w-0 flex-1">
+                <CardTitle className="text-base md:text-lg">Pacientes Recientes</CardTitle>
+                <CardDescription className="text-xs md:text-sm">Últimas consultas y monitoreos</CardDescription>
               </div>
               <Button 
                 variant="outline" 
                 size="sm"
+                className="text-xs flex-shrink-0"
                 onClick={() => navigate('/pacientes')}
               >
                 Ver Todos
@@ -315,30 +316,30 @@ export default function Dashboard() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="space-y-2 md:space-y-4">
               {stats?.pacientes_recientes && stats.pacientes_recientes.length > 0 ? (
                 stats.pacientes_recientes.slice(0, 5).map((patient) => (
                   <div
                     key={patient.id}
-                    className="flex items-center gap-4 p-4 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer"
+                    className="flex flex-col sm:flex-row items-start sm:items-center gap-2 md:gap-4 p-3 md:p-4 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer"
                     onClick={() => navigate(`/pacientes/${patient.id}`)}
                   >
-                    <div className="h-12 w-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-lg">
+                    <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm md:text-lg flex-shrink-0">
                       {patient.nombre.split(" ").map(n => n[0]).join("").substring(0, 2)}
                     </div>
                     
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <p className="font-semibold text-foreground">{patient.nombre}</p>
-                        <Badge className={getStatusColor(patient)}>
+                    <div className="flex-1 min-w-0 w-full sm:w-auto">
+                      <div className="flex flex-wrap items-center gap-1 md:gap-2 mb-1">
+                        <p className="font-semibold text-sm md:text-base text-foreground truncate">{patient.nombre}</p>
+                        <Badge className={`text-[10px] md:text-xs ${getStatusColor(patient)}`}>
                           {getStatusLabel(patient)}
                         </Badge>
                       </div>
-                      <p className="text-sm text-muted-foreground">
-                        {patient.edad} años • Tipo {patient.tipo_sangre} • Doc: {patient.documento}
+                      <p className="text-xs md:text-sm text-muted-foreground">
+                        {patient.edad} años • {patient.tipo_sangre} • {patient.documento}
                       </p>
                       {patient.ultima_consulta && (
-                        <p className="text-xs text-muted-foreground mt-1">
+                        <p className="text-[10px] md:text-xs text-muted-foreground mt-1">
                           Última consulta: {new Date(patient.ultima_consulta).toLocaleDateString()}
                         </p>
                       )}
@@ -346,40 +347,40 @@ export default function Dashboard() {
 
                     {/* Vitals */}
                     {patient.signos_vitales && (
-                      <div className="flex gap-4">
+                      <div className="flex gap-2 md:gap-4 w-full sm:w-auto justify-around sm:justify-start">
                         {patient.signos_vitales.pulso && (
                           <div className="text-center">
-                            <Heart className={`h-4 w-4 mx-auto mb-1 ${
+                            <Heart className={`h-3 w-3 md:h-4 md:w-4 mx-auto mb-1 ${
                               patient.signos_vitales.pulso < 50 || patient.signos_vitales.pulso > 120
                                 ? 'text-destructive'
                                 : 'text-green-600'
                             }`} />
-                            <p className="text-xs text-muted-foreground">FC</p>
-                            <p className="text-sm font-semibold">{patient.signos_vitales.pulso}</p>
+                            <p className="text-[10px] md:text-xs text-muted-foreground">FC</p>
+                            <p className="text-xs md:text-sm font-semibold">{patient.signos_vitales.pulso}</p>
                           </div>
                         )}
                         {patient.signos_vitales.spo2 && (
                           <div className="text-center">
-                            <Activity className={`h-4 w-4 mx-auto mb-1 ${
+                            <Activity className={`h-3 w-3 md:h-4 md:w-4 mx-auto mb-1 ${
                               patient.signos_vitales.spo2 < 90
                                 ? 'text-destructive'
                                 : 'text-blue-600'
                             }`} />
-                            <p className="text-xs text-muted-foreground">SpO₂</p>
-                            <p className="text-sm font-semibold">{patient.signos_vitales.spo2}%</p>
+                            <p className="text-[10px] md:text-xs text-muted-foreground">SpO₂</p>
+                            <p className="text-xs md:text-sm font-semibold">{patient.signos_vitales.spo2}%</p>
                           </div>
                         )}
                         {patient.signos_vitales.pa && (
                           <div className="text-center">
-                            <Droplet className="h-4 w-4 text-purple-600 mx-auto mb-1" />
-                            <p className="text-xs text-muted-foreground">PA</p>
-                            <p className="text-sm font-semibold">{patient.signos_vitales.pa}</p>
+                            <Droplet className="h-3 w-3 md:h-4 md:w-4 text-purple-600 mx-auto mb-1" />
+                            <p className="text-[10px] md:text-xs text-muted-foreground">PA</p>
+                            <p className="text-xs md:text-sm font-semibold">{patient.signos_vitales.pa}</p>
                           </div>
                         )}
                       </div>
                     )}
 
-                    <Button variant="outline" size="sm" onClick={(e) => {
+                    <Button variant="outline" size="sm" className="text-xs w-full sm:w-auto sm:flex-shrink-0" onClick={(e) => {
                       e.stopPropagation();
                       navigate(`/pacientes/${patient.id}`);
                     }}>
@@ -401,15 +402,16 @@ export default function Dashboard() {
       {/* Últimas Emergencias */}
       {stats?.ultimas_emergencias && stats.ultimas_emergencias.length > 0 && (
         <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle>Últimas Emergencias</CardTitle>
-                <CardDescription>Emergencias más recientes del sistema</CardDescription>
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between gap-2">
+              <div className="min-w-0 flex-1">
+                <CardTitle className="text-base md:text-lg">Últimas Emergencias</CardTitle>
+                <CardDescription className="text-xs md:text-sm">Emergencias más recientes del sistema</CardDescription>
               </div>
               <Button 
                 variant="outline" 
                 size="sm"
+                className="text-xs flex-shrink-0"
                 onClick={() => navigate('/emergencias')}
               >
                 Ver Todas
@@ -417,26 +419,29 @@ export default function Dashboard() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
+            <div className="space-y-2 md:space-y-3">
               {stats.ultimas_emergencias.map((emergencia) => (
                 <div
                   key={emergencia.id}
-                  className="flex items-center justify-between p-3 rounded-lg border hover:bg-accent/50 transition-colors cursor-pointer"
+                  className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 md:gap-3 p-2 md:p-3 rounded-lg border hover:bg-accent/50 transition-colors cursor-pointer"
                   onClick={() => navigate(`/emergencias/${emergencia.id}`)}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center">
-                      <AlertTriangle className="h-5 w-5 text-orange-600" />
+                  <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
+                    <div className="h-8 w-8 md:h-10 md:w-10 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
+                      <AlertTriangle className="h-4 w-4 md:h-5 md:w-5 text-orange-600" />
                     </div>
-                    <div>
-                      <p className="font-medium">{emergencia.paciente_nombre}</p>
-                      <p className="text-sm text-muted-foreground">
-                        Unidad: {emergencia.unidad} • {new Date(emergencia.fecha).toLocaleString()}
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium text-sm md:text-base truncate">{emergencia.paciente_nombre}</p>
+                      <p className="text-xs md:text-sm text-muted-foreground truncate">
+                        Unidad: {emergencia.unidad}
+                      </p>
+                      <p className="text-[10px] md:text-xs text-muted-foreground">
+                        {new Date(emergencia.fecha).toLocaleString()}
                       </p>
                     </div>
                   </div>
-                  <Button variant="outline" size="sm">
-                    Ver <ArrowUpRight className="ml-1 h-3 w-3" />
+                  <Button variant="outline" size="sm" className="text-xs w-full sm:w-auto sm:flex-shrink-0">
+                    Ver <ArrowUpRight className="ml-1 h-2 w-2 md:h-3 md:w-3" />
                   </Button>
                 </div>
               ))}

@@ -53,6 +53,20 @@ export default function Monitoring() {
     return critico ? 'bg-red-100 border-red-300' : 'bg-white';
   };
 
+  const getEstadoConfig = (estado: string) => {
+    const configs: Record<string, { label: string; color: string; bgColor: string; iconColor: string }> = {
+      'en_camino': { label: 'En Camino', color: 'bg-blue-100 text-blue-800', bgColor: 'bg-blue-100', iconColor: 'text-blue-600' },
+      'en_escena': { label: 'En Escena', color: 'bg-purple-100 text-purple-800', bgColor: 'bg-purple-100', iconColor: 'text-purple-600' },
+      'en_traslado': { label: 'En Traslado', color: 'bg-orange-100 text-orange-800', bgColor: 'bg-orange-100', iconColor: 'text-orange-600' },
+      'en_hospital': { label: 'En Hospital', color: 'bg-cyan-100 text-cyan-800', bgColor: 'bg-cyan-100', iconColor: 'text-cyan-600' },
+      'en_atencion': { label: 'En Atención', color: 'bg-yellow-100 text-yellow-800', bgColor: 'bg-yellow-100', iconColor: 'text-yellow-600' },
+      'estabilizado': { label: 'Estabilizado', color: 'bg-green-100 text-green-800', bgColor: 'bg-green-100', iconColor: 'text-green-600' },
+      'dado_alta': { label: 'Dado de Alta', color: 'bg-teal-100 text-teal-800', bgColor: 'bg-teal-100', iconColor: 'text-teal-600' },
+      'cerrado': { label: 'Cerrado', color: 'bg-gray-100 text-gray-800', bgColor: 'bg-gray-100', iconColor: 'text-gray-600' },
+    };
+    return configs[estado] || { label: 'Desconocido', color: 'bg-gray-100 text-gray-800', bgColor: 'bg-gray-100', iconColor: 'text-gray-600' };
+  };
+
   if (loading && !stats) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -270,41 +284,34 @@ export default function Monitoring() {
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              {stats.ultimas_emergencias.map((emergencia) => (
-                <div
-                  key={emergencia.id}
-                  className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
-                  onClick={() => navigate(`/emergencias/${emergencia.id}`)}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-lg ${
-                      emergencia.estado === 'en_traslado' ? 'bg-orange-100' : 
-                      emergencia.estado === 'atendido' ? 'bg-green-100' : 'bg-gray-100'
-                    }`}>
-                      {emergencia.estado === 'en_traslado' ? (
-                        <Clock className="h-4 w-4 text-orange-600" />
-                      ) : emergencia.estado === 'atendido' ? (
-                        <Activity className="h-4 w-4 text-green-600" />
-                      ) : (
-                        <AlertTriangle className="h-4 w-4 text-gray-600" />
-                      )}
+              {stats.ultimas_emergencias.map((emergencia) => {
+                const estadoConfig = getEstadoConfig(emergencia.estado);
+                return (
+                  <div
+                    key={emergencia.id}
+                    className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
+                    onClick={() => navigate(`/emergencias/${emergencia.id}`)}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`p-2 rounded-lg ${estadoConfig.bgColor}`}>
+                        <AlertTriangle className={`h-4 w-4 ${estadoConfig.iconColor}`} />
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900">{emergencia.paciente_nombre}</p>
+                        <p className="text-sm text-gray-600">Unidad: {emergencia.unidad}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-medium text-gray-900">{emergencia.paciente_nombre}</p>
-                      <p className="text-sm text-gray-600">Unidad: {emergencia.unidad}</p>
+                    <div className="text-right">
+                      <Badge className={estadoConfig.color}>
+                        {estadoConfig.label}
+                      </Badge>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {new Date(emergencia.fecha).toLocaleString()}
+                      </p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <Badge variant="outline">
-                      {emergencia.estado === 'en_traslado' ? 'En Traslado' :
-                       emergencia.estado === 'atendido' ? 'Atendido' : 'Cerrado'}
-                    </Badge>
-                    <p className="text-xs text-gray-500 mt-1">
-                      {new Date(emergencia.fecha).toLocaleString()}
-                    </p>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </CardContent>
         </Card>

@@ -336,47 +336,50 @@ export default function EmergenciaDetail() {
   const estadosDisponibles = getEstadosDisponibles();
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
+    <div className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto w-full">
       {/* Header */}
-      <div className="mb-6">
+      <div className="mb-4 md:mb-6">
         <Button
           variant="ghost"
           onClick={() => navigate('/emergencias')}
-          className="mb-4"
+          className="mb-3 md:mb-4 text-xs md:text-sm"
         >
-          <ArrowLeft className="mr-2 h-4 w-4" />
+          <ArrowLeft className="mr-2 h-3 w-3 md:h-4 md:w-4" />
           Volver a Emergencias
         </Button>
 
-        <div className="flex items-start justify-between flex-wrap gap-4">
-          <div>
-            <div className="flex items-center gap-3 mb-2 flex-wrap">
-              <h1 className="text-3xl font-bold text-gray-900">
+        <div className="flex flex-col sm:flex-row items-start justify-between gap-3 md:gap-4">
+          <div className="min-w-0 flex-1 w-full">
+            <div className="flex items-center gap-2 md:gap-3 mb-2 flex-wrap">
+              <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 truncate">
                 Emergencia #{emergencia.id}
               </h1>
-              <Badge className={`flex items-center gap-1 ${estadoConfig.color}`}>
-                <EstadoIcon className="h-3 w-3" />
+              <Badge className={`flex items-center gap-1 ${estadoConfig.color} text-[10px] md:text-xs flex-shrink-0`}>
+                <EstadoIcon className="h-2 w-2 md:h-3 md:w-3" />
                 {estadoConfig.label}
               </Badge>
               {esCritico && (
-                <Badge variant="destructive" className="animate-pulse">
+                <Badge variant="destructive" className="animate-pulse text-[10px] md:text-xs flex-shrink-0">
                   🚨 CRÍTICO
                 </Badge>
               )}
             </div>
-            <p className="text-gray-600">
-              Registrada el {new Date(emergencia.fecha).toLocaleString()}
+            <p className="text-xs md:text-sm text-gray-600">
+              Registrada el {new Date(emergencia.fecha).toLocaleString('es', { 
+                dateStyle: 'medium', 
+                timeStyle: 'short' 
+              })}
             </p>
           </div>
 
           {/* Selector de Estado */}
           {estadosDisponibles.length > 0 && (
-            <div className="flex gap-2">
+            <div className="flex gap-2 w-full sm:w-auto flex-shrink-0">
               <Select
                 value={estadoSeleccionado}
                 onValueChange={(value) => setEstadoSeleccionado(value as EstadoEmergencia)}
               >
-                <SelectTrigger className="w-[200px]">
+                <SelectTrigger className="w-full sm:w-[200px] text-xs md:text-sm">
                   <SelectValue placeholder="Cambiar estado..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -397,8 +400,9 @@ export default function EmergenciaDetail() {
               <Button
                 onClick={handleCambiarEstado}
                 disabled={!estadoSeleccionado || estadoSeleccionado === emergencia.estado}
+                className="text-xs md:text-sm flex-1 sm:flex-initial"
               >
-                <Edit className="mr-2 h-4 w-4" />
+                <Edit className="mr-2 h-3 w-3 md:h-4 md:w-4" />
                 Actualizar
               </Button>
             </div>
@@ -408,29 +412,29 @@ export default function EmergenciaDetail() {
 
       {/* Alerta Crítica */}
       {esCritico && (
-        <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded">
+        <div className="mb-4 md:mb-6 p-3 md:p-4 bg-red-50 border-l-4 border-red-500 rounded">
           <div className="flex items-center gap-2">
-            <AlertTriangle className="h-5 w-5 text-red-600" />
-            <p className="text-red-800 font-semibold">
+            <AlertTriangle className="h-4 w-4 md:h-5 md:w-5 text-red-600 flex-shrink-0" />
+            <p className="text-xs md:text-sm text-red-800 font-semibold">
               Signos vitales críticos detectados - Requiere atención inmediata
             </p>
           </div>
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
         {/* Columna Principal */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-4 md:space-y-6">
           {/* Información del Paciente */}
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <User className="h-5 w-5" />
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-base md:text-lg">
+                <User className="h-4 w-4 md:h-5 md:w-5" />
                 Información del Paciente
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+            <CardContent className="space-y-3 md:space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
                 <div>
                   <p className="text-sm text-gray-600">Nombre</p>
                   <p className="font-semibold">{emergencia.paciente_nombre}</p>
@@ -643,14 +647,14 @@ export default function EmergenciaDetail() {
           {/* Historial de Estados */}
           {emergencia.historial_estados && emergencia.historial_estados.length > 0 && (
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <History className="h-5 w-5" />
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-base md:text-lg">
+                  <History className="h-4 w-4 md:h-5 md:w-5" />
                   Historial de Estados
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
+                <div className="space-y-2 md:space-y-3">
                   {emergencia.historial_estados.map((historial) => {
                     const anteriorConfig = getEstadoConfig(historial.estado_anterior);
                     const nuevoConfig = getEstadoConfig(historial.estado_nuevo);
@@ -658,8 +662,8 @@ export default function EmergenciaDetail() {
                     const NuevoIcon = nuevoConfig.icon;
 
                     return (
-                      <div key={historial.id} className="flex gap-4 pb-3 border-b last:border-0">
-                        <div className="flex-shrink-0 w-24 text-sm text-gray-500">
+                      <div key={historial.id} className="flex flex-col sm:flex-row gap-2 sm:gap-4 pb-2 md:pb-3 border-b last:border-0">
+                        <div className="flex-shrink-0 text-xs md:text-sm text-gray-500">
                           {new Date(historial.created_at).toLocaleString('es', {
                             month: 'short',
                             day: 'numeric',
@@ -667,23 +671,23 @@ export default function EmergenciaDetail() {
                             minute: '2-digit'
                           })}
                         </div>
-                        <div className="flex-grow">
-                          <div className="flex items-center gap-2 mb-1">
-                            <Badge className={`${anteriorConfig.color} text-xs`}>
-                              <AnteriorIcon className="h-3 w-3 mr-1" />
-                              {anteriorConfig.label}
+                        <div className="flex-grow min-w-0">
+                          <div className="flex flex-wrap items-center gap-1 md:gap-2 mb-1">
+                            <Badge className={`${anteriorConfig.color} text-[10px] md:text-xs flex-shrink-0`}>
+                              <AnteriorIcon className="h-2 w-2 md:h-3 md:w-3 mr-1" />
+                              <span className="truncate max-w-[80px] sm:max-w-none">{anteriorConfig.label}</span>
                             </Badge>
-                            <span className="text-gray-400">→</span>
-                            <Badge className={`${nuevoConfig.color} text-xs`}>
-                              <NuevoIcon className="h-3 w-3 mr-1" />
-                              {nuevoConfig.label}
+                            <span className="text-gray-400 flex-shrink-0">→</span>
+                            <Badge className={`${nuevoConfig.color} text-[10px] md:text-xs flex-shrink-0`}>
+                              <NuevoIcon className="h-2 w-2 md:h-3 md:w-3 mr-1" />
+                              <span className="truncate max-w-[80px] sm:max-w-none">{nuevoConfig.label}</span>
                             </Badge>
                           </div>
-                          <p className="text-sm text-gray-600">
+                          <p className="text-xs md:text-sm text-gray-600 truncate">
                             Por: <span className="font-medium">{historial.usuario_nombre}</span>
                           </p>
                           {historial.observaciones && (
-                            <p className="text-sm text-gray-700 mt-1 italic">
+                            <p className="text-xs md:text-sm text-gray-700 mt-1 italic break-words">
                               "{historial.observaciones}"
                             </p>
                           )}

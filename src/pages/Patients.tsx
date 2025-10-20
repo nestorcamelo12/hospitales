@@ -130,17 +130,17 @@ export default function Patients() {
   }
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-4 md:space-y-6 w-full">
       {/* Header */}
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-3 md:gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Pacientes</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground">Pacientes</h1>
+          <p className="text-sm md:text-base text-muted-foreground mt-1">
             Gestión de pacientes del sistema ({total} registros)
           </p>
         </div>
         
-        <Button onClick={() => navigate('/pacientes/nuevo')} size="lg">
+        <Button onClick={() => navigate('/pacientes/nuevo')} size="default" className="w-full sm:w-auto">
           <Plus className="mr-2 h-4 w-4" />
           Nuevo Paciente
         </Button>
@@ -148,23 +148,23 @@ export default function Patients() {
 
       {/* Filters */}
       <Card>
-        <CardHeader>
-          <CardTitle>Filtros de Búsqueda</CardTitle>
-          <CardDescription>Busca pacientes por nombre o documento</CardDescription>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base md:text-lg">Filtros de Búsqueda</CardTitle>
+          <CardDescription className="text-xs md:text-sm">Busca pacientes por nombre o documento</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-2 md:gap-4">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Buscar por nombre o documento..."
+                placeholder="Buscar..."
                 value={searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
-                className="pl-10"
+                className="pl-10 text-sm md:text-base"
               />
             </div>
             {searchQuery && (
-              <Button variant="outline" onClick={() => handleSearch('')}>
+              <Button variant="outline" onClick={() => handleSearch('')} className="text-xs md:text-sm">
                 Limpiar
               </Button>
             )}
@@ -201,7 +201,7 @@ export default function Patients() {
             </div>
           ) : (
             <>
-              <div className="rounded-md border">
+              <div className="rounded-md border overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>

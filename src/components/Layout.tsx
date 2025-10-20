@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { 
   LayoutDashboard, 
@@ -13,7 +13,6 @@ import {
   Building2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface LayoutProps {
@@ -23,8 +22,28 @@ interface LayoutProps {
 export default function Layout({ children }: LayoutProps) {
   const location = useLocation();
   const navigate = useNavigate();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  // Sidebar cerrado por defecto en móviles, abierto en desktop
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const { user } = useAuth();
+
+  // Detectar tamaño de pantalla
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      // En desktop, abrir sidebar por defecto
+      if (!mobile) {
+        setSidebarOpen(true);
+      } else {
+        setSidebarOpen(false);
+      }
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Mapear role_id a role string
   const getUserRole = (): "doctor" | "paramedic" | "admin" => {
@@ -56,10 +75,20 @@ export default function Layout({ children }: LayoutProps) {
 
   return (
     <div className="min-h-screen bg-background w-full">
+      {/* Overlay para móviles */}
+      {isMobile && sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
       <aside
         className={`fixed inset-y-0 left-0 z-50 bg-sidebar border-r border-sidebar-border transition-all duration-300 ${
-          sidebarOpen ? "w-64" : "w-20"
+          isMobile 
+            ? (sidebarOpen ? "w-64 translate-x-0" : "w-64 -translate-x-full")
+            : (sidebarOpen ? "w-64" : "w-20")
         }`}
       >
         <div className="flex h-full flex-col">
@@ -121,8 +150,30 @@ export default function Layout({ children }: LayoutProps) {
       </aside>
 
       {/* Main Content */}
-      <div className={`transition-all duration-300 ${sidebarOpen ? "ml-64" : "ml-20"}`}>
-        <main className="min-h-screen p-6">
+      <div className={`transition-all duration-300 ${
+        isMobile ? "ml-0" : (sidebarOpen ? "ml-64" : "ml-20")
+      }`}>
+        {/* Header para móviles */}
+        {isMobile && (
+          <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background px-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setSidebarOpen(true)}
+              className="md:hidden"
+            >
+              <Menu className="h-6 w-6" />
+            </Button>
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-lg bg-gradient-primary flex items-center justify-center">
+                <Activity className="h-5 w-5 text-white" />
+              </div>
+              <span className="text-lg font-semibold">UNIPAZ</span>
+            </div>
+          </header>
+        )}
+        
+        <main className={`min-h-screen p-4 md:p-6 ${isMobile ? 'pt-4' : ''}`}>
           {children}
         </main>
       </div>
