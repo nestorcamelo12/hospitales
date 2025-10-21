@@ -1,73 +1,154 @@
-# Welcome to your Lovable project
+Información del proyecto
 
-## Project info
+URL: https://lovable.dev/projects/ed6f8a2f-380d-415e-b659-9663eccd3a46
 
-**URL**: https://lovable.dev/projects/ed6f8a2f-380d-415e-b659-9663eccd3a46
+¿Cómo puedo editar este código?
 
-## How can I edit this code?
+Hay varias formas de editar tu aplicación.
 
-There are several ways of editing your application.
+Usar Lovable
 
-**Use Lovable**
+Simplemente visita el Proyecto Lovable y comienza a dar instrucciones.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/ed6f8a2f-380d-415e-b659-9663eccd3a46) and start prompting.
+Los cambios realizados a través de Lovable se guardarán automáticamente en este repositorio.
 
-Changes made via Lovable will be committed automatically to this repo.
+Usar tu IDE preferido
 
-**Use your preferred IDE**
+Si prefieres trabajar localmente usando tu propio IDE, puedes clonar este repositorio y subir los cambios. Los cambios que subas también se reflejarán en Lovable.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+El único requisito es tener instalados Node.js y npm – instálalos con nvm
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+Sigue estos pasos:
 
-Follow these steps:
+# Paso 1: Clona el repositorio usando la URL Git del proyecto.
+git clone <TU_GIT_URL>
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# Paso 2: Navega al directorio del proyecto.
+cd <NOMBRE_DE_TU_PROYECTO>
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
+# Paso 3: Instala las dependencias necesarias.
 npm i
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Paso 4: Inicia el servidor de desarrollo con recarga automática y vista previa instantánea.
+npm run dev
+
+
+Editar un archivo directamente en GitHub
+
+Navega al archivo o archivos que desees modificar.
+
+Haz clic en el botón "Edit" (icono de lápiz) en la parte superior derecha de la vista del archivo.
+
+Realiza tus cambios y confirma (commit) las modificaciones.
+
+Usar GitHub Codespaces
+
+Ve a la página principal de tu repositorio.
+
+Haz clic en el botón "Code" (botón verde) cerca de la parte superior derecha.
+
+Selecciona la pestaña "Codespaces".
+
+Haz clic en "New codespace" para iniciar un nuevo entorno de Codespace.
+
+Edita los archivos directamente en el Codespace y luego realiza commit y push de tus cambios cuando termines.
+
+¿Qué tecnologías se usan en este proyecto?
+
+Este proyecto está construido con:
+
+Vite
+
+TypeScript
+
+React
+
+shadcn-ui
+
+Tailwind CSS
+
+¿Cómo puedo desplegar este proyecto?
+
+Simplemente abre Lovable y haz clic en Share -> Publish.
+
+¿Puedo conectar un dominio personalizado a mi proyecto Lovable?
+
+¡Sí, puedes hacerlo!
+
+Para conectar un dominio, ve a Project > Settings > Domains y haz clic en Connect Domain.
+
+# 🚀 Instalación Rápida - UNIPAZ Admin Panel
+
+## Pasos Rápidos (10 minutos)
+
+### 1️⃣ Base de Datos
+```bash
+# 1. Abre XAMPP y arranca Apache + MySQL
+# 2. Abre phpMyAdmin: http://localhost/phpmyadmin
+# 3. Importa: backend/scripts/db_schema.sql
+```
+
+### 2️⃣ Backend PHP
+```bash
+cd backend
+composer install
+copy env.example.txt .env
+# Edita .env con tus credenciales de MySQL
+php scripts/create_admin.php
+php -S localhost:8000 -t public
+```
+
+### 3️⃣ Frontend React
+```bash
+# Nueva terminal, desde la raíz
+npm install
+copy env.local.example .env.local
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+### 4️⃣ Acceder
+```
+Frontend: http://localhost:5173
+Backend:  http://localhost:8000
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Credenciales:
+Email:    admin@unipaz.local
+Password: Admin123!
+```
 
-**Use GitHub Codespaces**
+## ✅ Verificación
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- [ ] MySQL corriendo en XAMPP
+- [ ] Backend en puerto 8000
+- [ ] Frontend en puerto 5173
+- [ ] Login exitoso con admin@unipaz.local
+- [ ] Puedes ver y crear usuarios
+- [ ] Puedes ver y crear hospitales
 
-## What technologies are used for this project?
+## ❌ Problemas Comunes
 
-This project is built with:
+**No conecta a la BD**
+```bash
+# Verifica en backend/.env:
+DB_HOST=127.0.0.1
+DB_DATABASE=hospitales
+DB_USERNAME=root
+DB_PASSWORD=           # vacío por defecto en XAMPP
+```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+**CORS Error**
+```bash
+# En backend/.env debe ser:
+CORS_ORIGIN=http://localhost:5173
+```
 
-## How can I deploy this project?
+**Token expirado**
+- Cierra sesión y vuelve a entrar
 
-Simply open [Lovable](https://lovable.dev/projects/ed6f8a2f-380d-415e-b659-9663eccd3a46) and click on Share -> Publish.
+## 📚 Documentación Completa
 
-## Can I connect a custom domain to my Lovable project?
+Ver `README.md` para documentación detallada de la API y arquitectura.
 
-Yes, you can!
+---
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+¡Listo! 🎉 Ya puedes administrar usuarios y hospitales de UNIPAZ.
